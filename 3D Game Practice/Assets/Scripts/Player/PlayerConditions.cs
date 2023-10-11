@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem.XR;
 using UnityEngine.UI;
 
 public interface IDamagable
@@ -18,6 +20,7 @@ public class Condition
     public float regenRate;
     public float decayRate;
     public Image uiBar;
+
 
     public void Add(float amount)  // 회복(증가) 메서드
     {
@@ -44,11 +47,15 @@ public class PlayerConditions : MonoBehaviour, IDamagable
 
     public UnityEvent onTakeDamage;
 
+    public GameObject gameOver;
+    PlayerController controller;
+
     private void Start()
     {
         health.curValue = health.startValue;
         hunger.curValue = hunger.startValue;
         stamina.curValue = stamina.startValue;
+        controller = GetComponent<PlayerController>();
     }
 
     private void Update()
@@ -66,6 +73,8 @@ public class PlayerConditions : MonoBehaviour, IDamagable
         health.uiBar.fillAmount = health.GetPercentage();
         hunger.uiBar.fillAmount = hunger.GetPercentage();
         stamina.uiBar.fillAmount = stamina.GetPercentage();
+
+        Debug.Log(Time.timeScale);
     }
 
     public void Heal(float amount)
@@ -89,7 +98,18 @@ public class PlayerConditions : MonoBehaviour, IDamagable
 
     public void Die()
     {
-        Time.timeScale = 0f;
+        gameOver.SetActive(true);
+        controller.ToggleCursor(true);
+
+        if(gameOver.activeInHierarchy)
+        {
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+            
     }
 
     public void TakePhysicalDamage(int damageAmount)
